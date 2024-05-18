@@ -1,0 +1,18 @@
+USE [LibraryTest]
+
+/****** Object:  Table [dbo].[Clients]    Script Date: 18.05.2024 3:20:19 ******/
+SET ANSI_NULLS ON
+
+SET QUOTED_IDENTIFIER ON
+
+CREATE TABLE [dbo].[Clients](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nchar](100) NULL,
+	[Email] [nchar](100) NULL,
+ CONSTRAINT [PK_Clients] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+

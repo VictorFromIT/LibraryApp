@@ -1,0 +1,58 @@
+﻿@model LibraryApp.Models.Client
+
+@{
+	ViewBag.Title = "Добавить клиента";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Добавить клиента</title>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+        $(document).ready(function() {
+            $('#addClientForm').submit(function(event) {
+                event.preventDefault();
+
+                var clientData = {
+                    Name: $('#Name').val(),
+                    Email: $('#Email').val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(clientData),
+                    success: function (response) {
+						if (response.success) {
+							alert("Клиент успешно добавлен!");
+							$('#addClientForm')[0].reset();
+						} else {
+							alert("Ошибка: " + response.message);
+						}
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                        alert("При создании клиента произошла ошибка!");
+                    }
+                });
+            });
+        });
+	</script>
+</head>
+<body>
+	<h2>Добавить клиента</h2>
+
+	<form id="addClientForm">
+		<div class="form-group">
+			<label for="Name">Имя клиента</label>
+			<input type="text" id="Name" name="Name" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label for="Email">Email</label>
+			<input type="text" id="Email" name="Email" class="form-control" />
+		</div>
+		<button type="submit" class="btn btn-primary">Добавить клиента</button>
+	</form>
+</body>
+</html>

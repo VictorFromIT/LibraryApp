@@ -1,0 +1,138 @@
+﻿@{
+	ViewBag.Title = "Home Page";
+}
+
+@model IEnumerable<LibraryApp.Models.Book>
+
+<!DOCTYPE html>
+<html>
+<head>
+	<link href="~/Content/Site.css" rel="stylesheet" />
+	<title>Библиотека</title>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+        $(document).ready(function() {
+            // Функция для редактирования описания
+            $('.editDescription').click(function() {
+                var row = $(this).closest('tr');
+                var descriptionCell = row.find('.description');
+                var description = descriptionCell.text().trim();
+                var inputField = $('<input type="text" class="form-control descriptionInput" value="' + description + '">');
+                descriptionCell.empty().append(inputField);
+                $(this).hide();
+                row.find('.saveDescription').show();
+            });
+
+            // Функция для сохранения измененного описания
+            $('.saveDescription').click(function() {
+                var row = $(this).closest('tr');
+                var descriptionInput = row.find('.descriptionInput');
+                var description = descriptionInput.val();
+                var bookId = row.find('.bookId').text().trim();
+
+                $.ajax({
+                    url: '@Url.Action("UpdateBookDescription", "Home")',
+                    type: 'POST',
+                    data: { id: bookId, description: description },
+                    success: function(response) {
+                        if (response.success) {
+                            // Обновление описания на странице
+                            var descriptionCell = row.find('.description');
+                            descriptionCell.text(description);
+                            // Показать кнопку редактирования
+                            row.find('.editDescription').show();
+                            row.find('.saveDescription').hide();
+                        } else {
+                            alert("Ошибка: " + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                        alert("При изменении описания произошла ошибка!");
+                    }
+                });
+            });
+            // Функция для аренды или возврата книги
+            $('.rentOrReturnBook').click(function() {
+				var row = $(this).closest('tr');
+				var bookId = row.find('.bookId').text().trim();
+                var isAvailable = row.find('.isAvailable');
+				var booleanValue = JSON.parse(isAvailable.text().toLowerCase());;
+				console.log("Current isAvailable: " + booleanValue);
+
+				if (booleanValue) {
+					var clientEmail = prompt("Пожалуйста, введите Email клиента:");
+
+					if (!clientEmail) {
+						alert("Вы не ввели Email!");
+						return;
+					}
+                }
+
+                $.ajax({
+                    url: '@Url.Action("RentOrReturnBook", "Home")',
+                    type: 'POST',
+					data: { bookId: bookId, clientEmail: clientEmail, isAvailable: booleanValue },
+                    success: function(response) {
+                        if (response.success) {
+                            // Обновление кнопки и состояния книги на странице
+                            var button = row.find('.rentOrReturnBook');
+							if (booleanValue) {
+                                button.text('Возврат');
+								isAvailable.text('False');
+                            } else {
+                                button.text('Аренда');
+								isAvailable.text('True');
+                            }
+                        } else {
+                            alert("Error: " + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                        alert("При осуществлении аренды произошла ошибка!");
+                    }
+                });
+            });
+        });
+	</script>
+</head>
+<body>
+	<div>
+		<h3>Библиотека</h3>
+		<a href="@Url.Action("AddBook", "Book")" class="btn btn-primary">Добавить книгу</a>
+		<a href="@Url.Action("AddClient", "Client")" class="btn btn-primary">Добавить клиента</a>
+		<table id="booksTable">
+			<thead>
+				<tr>
+					<th>Номер</th>
+					<th>Название книги</th>
+					<th>Автор</th>
+                    <th>Состояние</th>
+					<th>Описание</th>
+					<th>Функциональные возможности</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var book in Model)
+				{
+					<tr>
+						<td class="bookId">@book.Id</td>
+						<td>@book.Name</td>
+						<td>@book.Author</td>
+						<td class="isAvailable">@book.IsAvailable</td>
+						<td class="description">@book.Description</td>
+						<td>
+							<button class="editDescription btn btn-primary">Изменить описание</button>
+							<button class="saveDescription btn btn-success" style="display:none;">Сохранить</button>
+							<button class="rentOrReturnBook btn btn-secondary" data-isavailable="@book.IsAvailable">
+								@(book.IsAvailable ? "Аренда" : "Возврат")
+							</button>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+    </div>
+</body>
+</html>

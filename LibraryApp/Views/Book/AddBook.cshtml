@@ -1,0 +1,62 @@
+﻿@model LibraryApp.Models.Book
+
+@{
+    ViewBag.Title = "Добавить книгу";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Добавить книгу</title>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+        $(document).ready(function() {
+            $('#createBookForm').submit(function(event) {
+                event.preventDefault();
+
+                var bookData = {
+                    Name: $('#Name').val(),
+                    Author: $('#Author').val(),
+                    Description: $('#Description').val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(bookData),
+                    success: function(response) {
+                        alert("Книга добавлена успешно!");
+                        // Очистка формы после успешного добавления книги
+                        $('#createBookForm')[0].reset();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                        alert("При добавлении книги произошла ошибка!");
+                    }
+                });
+            });
+        });
+	</script>
+</head>
+<body>
+	<h2>Добавить книгу</h2>
+
+	<form id="createBookForm">
+		<div class="form-group">
+			<label for="Name">Название книги</label>
+			<input type="text" id="Name" name="Name" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label for="Author">Автор</label>
+			<input type="text" id="Author" name="Author" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label for="Description">Описание</label>
+			<input type="text" id="Description" name="Description" class="form-control" />
+		</div>
+		<div>
+			<button type="submit" class="btn btn-primary">Добавить книгу</button>
+		</div>
+	</form>
+</body>
+</html>
